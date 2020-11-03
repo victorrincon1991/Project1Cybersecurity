@@ -2,11 +2,10 @@
 
 The files in this repository were used to configure the network depicted below.
 
-![TODO: Update the path with the name of your diagram](Images/diagram_filename.png)
 
-These files have been tested and used to generate a live ELK deployment on Azure. They can be used to either recreate the entire deployment pictured above. Alternatively, select portions of the _____ file may be used to install only certain pieces of it, such as Filebeat.
 
-  - _TODO: Enter the playbook file._
+These files have been tested and used to generate a live ELK deployment on Azure.
+
 
 This document contains the following details:
 - Description of the Topologu
@@ -28,7 +27,6 @@ Load balancing ensures that the application will be highly available, in additio
 Integrating an ELK server allows users to easily monitor the vulnerable VMs for changes to the file systems of the VMs on the network, as well as watch system metrics, such as: CPU usage; attempted SSH logins; sudo escalation failures.
 
 The configuration details of each machine may be found below.
-_Note: Use the [Markdown Table Generator](http://www.tablesgenerator.com/markdown_tables) to add/remove values from the table_.
 
 | Name      | Function     | IP Address | Operating System |
 |-----------|--------------|------------|------------------|
@@ -71,29 +69,100 @@ Configures the container to start with the following port mappings
 9200:9200
 5044:5044
 
-![](Image/4.PNG)
+https://github.com/victorrincon1991/Project1Cybersecurity/blob/main/Image/4.PNG
+
+https://github.com/victorrincon1991/Project1Cybersecurity/blob/main/Image/5.PNG
+
 
 ### Target Machines & Beats
 This ELK server is configured to monitor the following machines:
-- _TODO: List the IP addresses of the machines you are monitoring_
+
+Web-1    10.0.0.5
+Web-2    10.0.0.6
+DVWA-VM2 10.0.0.7
+
 
 We have installed the following Beats on these machines:
-- _TODO: Specify which Beats you successfully installed_
+
+Filebeat
+Metricbeat
+Packetbeat
 
 These Beats allow us to collect the following information from each machine:
-- _TODO: In 1-2 sentences, explain what kind of data each beat collects, and provide 1 example of what you expect to see. E.g., `Winlogbeat` collects Windows logs, which we use to track user logon events, etc._
+
+Filebeat detects changes to the filesystem. Specifically, we use it to collect Apache logs.
+Metricbeat detects changes in system metrics, such as CPU usage. We use it to detect SSH login attempts, failed sudo escalations, and CPU/RAM statistics.
+Packetbeat collects packets that pass through the NIC, similar to Wireshark. We use it to generate a trace of all activity that takes place on the network, in case later forensic analysis should be warranted.
+The playbooks below install Filebeat and Metricbeat on the target hosts.
+
+https://github.com/victorrincon1991/Project1Cybersecurity/blob/main/Scripts/Filebeat/Installation-Filebeat.yml
+
+https://github.com/victorrincon1991/Project1Cybersecurity/blob/main/Scripts/Meticbeat/Installation-Metricbeat.yml
+
 
 ### Using the Playbook
-In order to use the playbook, you will need to have an Ansible control node already configured. Assuming you have such a control node provisioned: 
+In order to use the playbooks, you will need to have an Ansible control node already configured. We use the Jump Box for this purpose.
 
-SSH into the control node and follow the steps below:
-- Copy the _____ file to _____.
-- Update the _____ file to include...
-- Run the playbook, and navigate to ____ to check that the installation worked as expected.
+First we must SSH into the Jump Box and locate, start, and attach to our Ansible container.
 
-_TODO: Answer the following questions to fill in the blanks:_
-- _Which file is the playbook? Where do you copy it?_
-- _Which file do you update to make Ansible run the playbook on a specific machine? How do I specify which machine to install the ELK server on versus which to install Filebeat on?_
-- _Which URL do you navigate to in order to check that the ELK server is running?
+$ ssh RedAdmin@40.88.125.174
 
-_As a **Bonus**, provide the specific commands the user will need to run to download the playbook, update the files, etc._
+$ sudo docker ps
+
+$ sudo docker list -a
+
+$ sudo docker start nice_moore
+
+$ sudo docker attach nice_moore
+
+The easiest way to copy the playbooks is to use Git:
+
+$ cd /etc/ansible
+
+$ mkdir files
+
+https://github.com/victorrincon1991/Project1Cybersecurity/blob/main/Image/6.PNG
+
+### Playbooks and Hosts file into /etc/ansible
+
+$ cp Automated-ELK-Stack-Deployment/resources/* .
+
+$ cp Automated-ELK-Stack-Deployment/resources/* ./files
+
+This copies the playbook files to the correct place.
+
+Next, you must create a hosts file to specify which VMs to run each playbook on. Run the commands below:
+
+$ cd /etc/ansible
+
+$ cat > hosts <<EOF
+
+[webservers]
+
+10.0.0.5
+
+10.0.0.6
+
+10.0.0.7
+
+[elk]
+
+10.1.0.4
+
+EOF
+
+After this, run the commands below to run the playbooks:
+
+$ cd /etc/ansible/files
+
+$ ansible-playbook install_elk.yml elk
+
+$ ansible-playbook install_filebeat.yml webservers
+
+$ ansible-playbook install_metricbeat.yml webservers
+
+https://github.com/victorrincon1991/Project1Cybersecurity/blob/main/Image/3.PNG
+
+
+
+
