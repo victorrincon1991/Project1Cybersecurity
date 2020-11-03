@@ -21,54 +21,57 @@ This document contains the following details:
 
 The main purpose of this network is to expose a load-balanced and monitored instance of DVWA, the D*mn Vulnerable Web Application.
 
-Load balancing ensures that the application will be highly _____, in addition to restricting _____ to the network.
-- _TODO: What aspect of security do load balancers protect? What is the advantage of a jump box?_
+The main purpose of this network is to expose a load-balanced and monitored instance of DVWA, the D*mn Vulnerable Web Application.
 
-Integrating an ELK server allows users to easily monitor the vulnerable VMs for changes to the _____ and system _____.
-- _TODO: What does Filebeat watch for?_
-- _TODO: What does Metricbeat record?_
+Load balancing ensures that the application will be highly available, in addition to restricting inbound access to the network. The load balancer ensures that work to process inccoming traffic will be shared by both vulnerable web servers. The off-loading function of a load balancer defends an organization against distributed denial-of-service (DDoS) attacks. It does this by shifting attack traffic from the corporate server to a public cloud provider Access controls will ensure that only authorized users will be able to connect in the first place.
+
+Integrating an ELK server allows users to easily monitor the vulnerable VMs for changes to the file systems of the VMs on the network, as well as watch system metrics, such as: CPU usage; attempted SSH logins; sudo escalation failures.
 
 The configuration details of each machine may be found below.
 _Note: Use the [Markdown Table Generator](http://www.tablesgenerator.com/markdown_tables) to add/remove values from the table_.
 
-| Name     | Function | IP Address | Operating System |
-|----------|----------|------------|------------------|
-| Jump Box | Gateway  | 10.0.0.1   | Linux            |
-| TODO     |          |            |                  |
-| TODO     |          |            |                  |
-| TODO     |          |            |                  |
+| Name      | Function     | IP Address | Operating System |
+|-----------|--------------|------------|------------------|
+| Jump Box  | Gateway      | 10.0.0.1   | Linux            |
+| WEB-1     |Web Server    | 10.0.0.5   | Linux            |
+| WEB-2     |Web Server    | 10.0.0.6   | Linux            |
+| DVWA-VM2  |Backup Server | 10.0.0.7   | Linux            |
+|ELK        |Monitoring    | 10.1.0.4   | Linux            |
 
 ### Access Policies
 
 The machines on the internal network are not exposed to the public Internet. 
 
-Only the _____ machine can accept connections from the Internet. Access to this machine is only allowed from the following IP addresses:
-- _TODO: Add whitelisted IP addresses_
+Only the jump-box machine machine can accept connections from the Internet. Access to this machine is only allowed from the following IP addresses:40.88.125.174
 
-Machines within the network can only be accessed by _____.
-- _TODO: Which machine did you allow to access your ELK VM? What was its IP address?_
+Machines within the network can only be accessed by each other. WEB-1, WEB-2, DVWA-VM2 VMs send traffic to the ELK server.
+
 
 A summary of the access policies in place can be found in the table below.
 
 | Name     | Publicly Accessible | Allowed IP Addresses |
 |----------|---------------------|----------------------|
-| Jump Box | Yes/No              | 10.0.0.1 10.0.0.2    |
-|          |                     |                      |
-|          |                     |                      |
+| Jump Box | Yes                 | 40.88.125.174        |
+| Web-1    | No                  | 10.0.0.0/16          |
+| Web-2    | No                  | 10.0.0.0/16          |
+| DVWA-VM2 | No                  | 10.0.0.0/16          |
+| ELK      | No                  | 10.1.0.0/16          |
 
 ### Elk Configuration
 
-Ansible was used to automate configuration of the ELK machine. No configuration was performed manually, which is advantageous because...
-- _TODO: What is the main advantage of automating configuration with Ansible?_
+The ELK VM uses Docker to download and manage an ELK container that exposes an Elastic Stack instance. Rather than configure ELK manually, we opted to develop a reusable Ansible Playbook to accomplish the task. The playbook implements the following tasks:
 
-The playbook implements the following tasks:
-- _TODO: In 3-5 bullets, explain the steps of the ELK installation play. E.g., install Docker; download image; etc._
-- ...
-- ...
+Installs docker.io: the Docker engine, used for running containers
+Installs python3-pip: Package used to install Python software
+Installs docker module: Python client for Docker
+Increases the virtual memory of the target VM in order to run the ELK container
+Downloads and launches the Docker container called sebp/elk:761
+Configures the container to start with the following port mappings
+5601:5601
+9200:9200
+5044:5044
 
-The following screenshot displays the result of running `docker ps` after successfully configuring the ELK instance.
-
-![TODO: Update the path with the name of your screenshot of docker ps output](Images/docker_ps_output.png)
+![](Image/4.PNG)
 
 ### Target Machines & Beats
 This ELK server is configured to monitor the following machines:
